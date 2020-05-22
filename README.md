@@ -51,7 +51,7 @@ A simple understanding of TDD. Check out the jsTinyTest folder to learn if you'r
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE](jsTinyTest/LICENSE) file for details
 
 ## Acknowledgments
 
