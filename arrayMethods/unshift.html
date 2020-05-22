@@ -1,0 +1,78 @@
+<script src="../simpletest.js"></script>
+<script>
+  
+  /*
+  The unshift() method adds one or more elements to the beginning of an array and returns the new length of the array.
+  
+  Syntax: 
+    Formula: unshift(array, [,...newElements])
+  
+    Arguments: 
+    array
+    [...newElements]
+  
+    Return Value: The new length property of the object upon which the method was called
+  
+  Tests:
+    array:
+      It should take an array as the first argument [DONE]
+      It should add newElements.length to the length of the array [DONE]
+    elementN:
+      It should add one or more elements to the beginning of an array [DONE]
+    return value:
+      It should return the length of the array [DONE]
+  */
+
+  function unshift(array, ...newElements) {
+    // Validity check
+    if (!Array.isArray(array)) {
+      throw new TypeError('First argument is not an array');
+    }
+
+    // Adding newElements.length holes at the end of the array
+    array.length = array.length + newElements.length;
+
+    // Shift array items to the right by newElements.length
+    for (var i = array.length - 1; i > newElements.length - 1; i--) {
+      array[i] = array[i - newElements.length];
+    }
+
+    // Add newElements to the front of the array
+    for (var i = 0; i < newElements.length; i++) {
+      array[i] = newElements[i];
+    }
+    return array.length;
+  }
+
+
+  tests({
+    'It should take an array as the first argument': function () {
+      var isTypeError = false;
+      try {
+        unshift('I am not an array');
+      }
+      catch (error) {
+        isTypeError = error instanceof TypeError;
+        var errorMessage = error.message;
+      }
+      eq(isTypeError, true);
+      eq(errorMessage, 'First argument is not an array');
+    },
+    'It should add newElements.length to the length of the array': function () {
+      var testArray = [1, 2, 3];
+      unshift(testArray, 1, 2);
+      eq(testArray.length, 5);
+    },
+    'It should add one or more elements to the beginning of an array': function () {
+      var testArray = [3];
+      unshift(testArray, 1, 2);
+      eq(testArray[0], 1);
+      eq(testArray[1], 2);
+      eq(testArray[2], 3);
+    },
+    'It should return the length of the array': function () {
+      var result = unshift([1, 2], 3, 4);
+      eq(result, 4);
+    }
+  });
+</script>

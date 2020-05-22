@@ -1,0 +1,115 @@
+<script src="../simpletest.js"></script>
+<script>
+  
+  /*
+  The includes() method determines whether an array includes a certain value among its entries, returning true or false as appropriate.
+  
+  Syntax: 
+    Formula: includes(array, valueToFind[, fromIndex])
+  
+    Arguments:
+    array
+    valueToFind
+    [fromIndex]
+  
+    Return Value: A Boolean which is true if the value valueToFind is found within the array
+  
+  Tests:
+    array:
+      It should take an array as the first argument [DONE]
+    valueToFind:
+      It should be case sensitive when comparing strings and characters [DONE]
+    fromIndex:
+      It should start from an optional third argument fromIndex [DONE]
+      It should offset from the end of the array if fromIndex is a negative number [DONE]
+      It should search the entire array if computed index is less than 0 [DONE]
+      It should default fromIndex to 0 if omitted [DONE]
+    return value:
+      It should return true if the valueToFind is in the array using strict equality comparison (to fulfill SameValueZero comparison) [DONE]
+      It should return true if the valueToFind is in the array using Object.is comparison (to fulfill SameValueZero comparison) [DONE]
+      It should return false if the valueToFind is not found [DONE]
+      It should return false if fromIndex is greater than or equal to the array length [DONE]
+  */
+
+  function includes(array, valueToFind, fromIndex) {
+    // Validity check
+    if (!Array.isArray(array)) {
+      throw new TypeError('First argument is not an array');
+    }
+
+    // Modifying arguments into valid input
+    if (fromIndex === undefined) {
+      var fromIndex = 0;
+    }
+    if (fromIndex < 0) {
+      fromIndex = array.length + fromIndex;
+    }
+
+    // Looping through array to find value
+    for (var i = fromIndex; i < array.length; i++) {
+      // SameValueZero comparison is used
+      if (Object.is(array[i], valueToFind) || array[i] === valueToFind) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  tests({
+    'It should take an array as the first argument': function () {
+      var isTypeError = false;
+      try {
+        includes('I am not an array');
+      }
+      catch (error) {
+        isTypeError = error instanceof TypeError;
+        var errorMessage = error.message;
+      }
+      eq(isTypeError, true);
+      eq(errorMessage, 'First argument is not an array');
+    },
+    'It should be case sensitive when comparing strings and characters': function () {
+      var result = includes(['a'], 'A');
+      eq(result, false);
+    },
+    'It should start from an optional third argument fromIndex': function () {
+      var result = includes([3, 1, 2, 4, 5], 3, 1);
+      eq(result, false);
+    },
+    'It should offset from the end of the array if fromIndex is a negative number': function () {
+      var result = includes([3, 2, 2], 3, -1);
+      eq(result, false);
+    },
+    'It should search the entire array if computed index is less than 0': function () {
+      var result = includes([1, 2, 3], 3, -10);
+      eq(result, true);
+    },
+    'It should default fromIndex to 0 if omitted': function () {
+      var result = includes([1, 2], 1);
+      eq(result, true);
+    },
+    // Comparison uses the SameValueZero comparison, which is the union of true comparisons of the [strict equality comparison] and the [Object.is] comparison
+    'It should return true if the valueToFind is in the array using strict equality comparison': function () {
+      var result = includes([3], 3);
+      eq(result, true);
+
+      var result2 = includes([-0], 0);
+      eq(result2, true);
+
+      var result3 = includes([+0], -0);
+      eq(result3, true);
+    },
+    'It should return true if the valueToFind is in the array using Object.is comparison': function () {
+      var result = includes([NaN], NaN);
+      eq(result, true);
+    },
+    'It should return false if the valueToFind is not found': function () {
+      var result = includes([1, 2, 3], 4);
+      eq(result, false);
+    },
+    'It should return false if fromIndex is greater than or equal to the array length': function () {
+      var result = includes([1, 2, 3], 3, 3);
+      eq(result, false);
+    }
+  });
+</script>

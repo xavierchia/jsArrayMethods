@@ -1,0 +1,170 @@
+<script src="../simpletest.js"></script>
+
+<script>
+  
+  /*
+  The findIndex() method returns the index of the first element in the array that satisfies the provided testing function. Otherwise, it returns -1, indicating that no element passed the test.
+  
+  Syntax:
+    Function: findIndex(array, callback(element[, index[, array]]) [, thisArg])
+  
+    Arguments:
+    callback
+      element
+      [index]
+      [array]
+    thisArg
+  
+    Return Value: The index of the first element in the array that passes the test. Otherwise, -1.
+  
+  Tests:
+    array:
+      It should take an array as the first argument [DONE]
+    callback:
+      It should take a callback as the second argument [DONE]
+      It should run callback function on each element in the array if each does not pass the testing function [DONE]
+      It should not run callback on any elements added to the array after the call to findIndex begins [DONE]
+      It should run callback on an existing, yet unvisited element value, where the value passed to the callback will be the value at the time `find` visits the element's index [DONE]
+      It should run callback on indexes without assigned values [DONE]
+      It should run callback on elements that are deleted [DONE]
+    callback arguments:
+      It should take the current element being processed in the array as the first argument in the callback [DONE]
+      It should take the index of the current element being processed in the array as the second optional argument in the callback [DONE]
+      It should take the array findIndex() was called upon as the third optional argument in the callback [DONE]
+    thisArg:
+      It should take an object to use as `this` when executing the callback as the third optional argument [DONE]
+    return value:
+      It should return the index of the first element in the array that passes the test [DONE]
+      It should return -1 if no elements in the array satisfies the provided testing function [DONE]
+      It should return -1 if array length is 0 [DONE]
+  */
+
+  function findIndex(array, callback, thisArg) {
+    // Validity check
+    if (!Array.isArray(array)) {
+      throw new TypeError('First argument is not an array');
+    }
+    if (typeof callback !== 'function') {
+      throw new TypeError('Second argument is not a function');
+    }
+
+    if (thisArg) {
+      callback = callback.bind(thisArg);
+    }
+
+    // Loop through the array and run callback
+    var arrayLengthInitial = array.length;
+    for (var i = 0; i < arrayLengthInitial; i++) {
+      if (callback(array[i], i, array)) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  tests({
+    'It should take an array as the first argument': function () {
+      var isTypeError = false;
+      try {
+        findIndex('I am not an array');
+      }
+      catch (error) {
+        isTypeError = error instanceof TypeError;
+        var errorMessage = error.message;
+      }
+      eq(isTypeError, true);
+      eq(errorMessage, 'First argument is not an array');
+    },
+    'It should take a callback as the second argument': function () {
+      var isTypeError = false;
+      try {
+        findIndex([1, 2, 3], 'I am not a function');
+      }
+      catch (error) {
+        isTypeError = error instanceof TypeError;
+        var errorMessage = error.message;
+      }
+      eq(isTypeError, true);
+      eq(errorMessage, 'Second argument is not a function');
+    },
+    'It should run callback function on each element in the array if it does not pass the testing function': function () {
+      var numTimesCallbackRan = 0;
+      findIndex([1, 2, 3], function () {
+        numTimesCallbackRan++;
+      });
+      eq(numTimesCallbackRan, 3);
+    },
+    'It should not visit any elements added to the array after the call to findIndex begins': function () {
+      var numTimesCallbackRan = 0;
+      var testArray = [1, 2, 3];
+      findIndex(testArray, function () {
+        numTimesCallbackRan++;
+        testArray.push(5);
+      })
+      eq(numTimesCallbackRan, 3);
+    },
+    'It should run callback on an existing, yet unvisited element value, where the value passed to the callback will be the value at the time `find` visits the element\'s index': function () {
+      var testArray = [1, 2, 3];
+      var result = findIndex(testArray, function (element) {
+        testArray[2] = 6;
+        return element === 6;
+      });
+      eq(result, 2);
+    },
+    'It should run callback on indexes without assigned values': function () {
+      var numTimesCallbackRan = 0;
+      findIndex([, , 3], function () {
+        numTimesCallbackRan++;
+      });
+      eq(numTimesCallbackRan, 3);
+    },
+    'It should visit elements that are deleted': function () {
+      var numTimesCallbackRan = 0;
+      var testArray = [1, 2, 3];
+      findIndex(testArray, function (element, index) {
+        if (index === 0) {
+          delete testArray[2];
+        }
+        numTimesCallbackRan++;
+      });
+      eq(numTimesCallbackRan, 3);
+    },
+    'It should take the current element being processed in the array as the first argument in the callback': function () {
+      findIndex([1], function (element) {
+        eq(element, 1);
+      });
+    },
+    'It should take the index of the current element being processed in the array as the second optional argument in the callback': function () {
+      findIndex([1], function (element, index) {
+        eq(index, 0);
+      });
+    },
+    'It should take the array findIndex() was called upon as the third optional argument in the callback': function () {
+      var testArray = [1, 2, 3];
+      findIndex(testArray, function (element, index, array) {
+        eq(testArray, array);
+      });
+    },
+    'It should take an optional object to use as `this` when executing the callback': function () {
+      findIndex([1], function () {
+        eq(this.description, 'I am an object description property')
+      }, { description: 'I am an object description property' })
+    },
+    'It should return the index of the first element in the array that passes the test': function () {
+      var result = findIndex([1, 2, 3], function (element) {
+        return element > 2;
+      });
+      eq(result, 2);
+    },
+    'It should return -1 if no elements in the array satisfies the provided testing function': function () {
+      var result = findIndex([1, 2, 3], function (element) {
+        return element > 3;
+      });
+      eq(result, -1);
+    },
+    'It should return -1 if array length is 0': function () {
+      findIndex([], function () { })
+    }
+  });
+
+</script>

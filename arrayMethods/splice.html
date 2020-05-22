@@ -1,0 +1,239 @@
+<script src="../simpletest.js"></script>
+<script>
+
+  /*
+  The splice() method changes the contents of an array by removing or replacing existing elements and/or adding new elements in place.
+  
+  Syntax
+    Function: splice(array, start[, deleteCount[, itemN]])
+  
+    Arguments:
+      array
+      start
+      [deleteCount]
+      [itemN]
+  
+    Return Value: An array containing the deleted elements
+  
+  Tests:
+    array:
+      It should take an array as the first argument [DONE]
+    start:
+      It should take start as the second argument and return an empty array if omitted [DONE]
+      It should add itemsN from the start index and shift to the right all elements after [DONE]
+      It should add items to the end of the array if start is greater than or equal to the length of the array [DONE]
+      It should start at (array.length + start) if start is negative [DONE]
+      It should start from 0 if (array.length + start) if less than 0 [DONE]
+    deleteCount:
+      It should take deleteCount as the third optional argument and remove the number of elements from start [DONE]
+      It should delete all elements from start to the end of the array if [deleteCount] is omitted [DONE]
+      It should delete all elements from start to the end of the array if [deleteCount] is larger than the number of elements between start and array.length [DONE]
+      It should not remove any elements if [deleteCount] is 0 [DONE]
+      It should not remove any elements if [deleteCount] is negative [DONE]
+    itemN:
+      It should take [itemN] as the fourth optional argument and add elements to the array beginning from start [DONE]
+    return value:
+      It should return an array containing the deleted elements [DONE]
+      It should return an empty array if no elements were deleted [DONE]
+  */
+
+  function splice(array, start, deleteCount, ...itemsN) {
+    // Validity check
+    if (!Array.isArray(array)) {
+      throw new TypeError('First argument is not an array');
+    }
+
+    // Modifying start into valid input
+    if (start === undefined) {
+      return [];
+    }
+    if (start < 0) {
+      start = array.length + start;
+      if (start < 0) {
+        start = 0;
+      }
+    }
+
+    // Modifying deleteCount into valid input
+    if (deleteCount === undefined) {
+      var deleteCount = array.length - start;
+    }
+    if (deleteCount > array.length - start) {
+      deleteCount = array.length - start;
+    }
+    if (deleteCount < 0) {
+      deleteCount = 0;
+    }
+
+    // Creating deletedArray and endOfArray
+    var deletedArray = [];
+    var endOfArray = [];
+
+    // Adding itemsN to endOfArray
+    for (var i = 0; i < itemsN.length; i++) {
+      endOfArray.push(itemsN[i]);
+    }
+
+    // Adding deleted items to deletedArray
+    // Adding remainder array items to endOfArray
+    for (var i = start; i < array.length; i++) {
+      if (i < start + deleteCount) {
+        deletedArray.push(array[i]);
+      }
+      else {
+        endOfArray.push(array[i]);
+      }
+    }
+
+    // Adding endOfArray to array
+    var arrayOriginalLength = array.length;
+    for (var i = 0; i < endOfArray.length; i++) {
+      array[start] = endOfArray[i];
+      start++;
+    }
+
+    // Trimming modified array
+    var arrayFinalLength = arrayOriginalLength - deleteCount + itemsN.length;
+    array.length = arrayFinalLength;
+
+    return deletedArray;
+  }
+
+  tests({
+    'It should take an array as the first argument': function () {
+      var isTypeError = false;
+      try {
+        splice('I am not an array');
+      }
+      catch (e) {
+        isTypeError = e instanceof TypeError;
+      }
+      eq(isTypeError, true);
+    },
+
+    'It should return an array containing the deleted elements': function () {
+      var deletedArray = splice([1, 2, 3, 4], 1, 2);
+      eq(deletedArray[0], 2);
+      eq(deletedArray[1], 3);
+      eq(deletedArray.length, 2);
+    },
+
+    'It should return an empty array if no elements were deleted': function () {
+      var emptyArray = splice([1, 2, 3, 4], 0, 0);
+      eq(Array.isArray(emptyArray), true);
+      eq(emptyArray.length, 0);
+    },
+
+    'It should take start as the second argument and return an empty array if omitted': function () {
+      var emptyArray = splice([1, 2, 3, 4]);
+      eq(Array.isArray(emptyArray), true);
+      eq(emptyArray.length, 0);
+    },
+
+    'It should add itemsN from the start index and shift to the right all elements after': function () {
+      var testArray = [1, 4, 5];
+      splice(testArray, 1, 0, 2, 3);
+      eq(testArray[0], 1);
+      eq(testArray[1], 2);
+      eq(testArray[2], 3);
+      eq(testArray[3], 4);
+      eq(testArray[4], 5);
+      eq(testArray.length, 5);
+    },
+
+    'It should add items to the end of the array if start is greater than or equal to the length of the array': function () {
+      var testArray = [1, 2, 3];
+      splice(testArray, 3, 0, 4, 5, 6);
+      eq(testArray[0], 1);
+      eq(testArray[1], 2);
+      eq(testArray[2], 3);
+      eq(testArray[3], 4);
+      eq(testArray[4], 5);
+      eq(testArray[5], 6);
+      eq(testArray.length, 6);
+    },
+
+    'It should start at (array.length + start) if start is negative': function () {
+      var testArray = [1, 2, 5];
+      splice(testArray, -1, 0, 3, 4);
+      eq(testArray[0], 1);
+      eq(testArray[1], 2);
+      eq(testArray[2], 3);
+      eq(testArray[3], 4);
+      eq(testArray[4], 5);
+      eq(testArray.length, 5);
+    },
+
+    'It should start from 0 if (array.length + start) if less than 0': function () {
+      var testArray = [3, 4, 5];
+      splice(testArray, -4, 0, 1, 2);
+      eq(testArray[0], 1);
+      eq(testArray[1], 2);
+      eq(testArray[2], 3);
+      eq(testArray[3], 4);
+      eq(testArray[4], 5);
+      eq(testArray.length, 5);
+    },
+
+    'It should take deleteCount as the third optional argument and remove the number of elements from start': function () {
+      var testArray = [1, 2, 3, 4];
+      splice(testArray, 0, 1);
+      eq(testArray[0], 2);
+      eq(testArray[1], 3);
+      eq(testArray[2], 4);
+      eq(testArray.length, 3);
+    },
+
+    'It should delete all elements from start to the end of the array if [deleteCount] is omitted': function () {
+      var testArray = [1, 2, 3, 4, 5];
+      splice(testArray, 3);
+      eq(testArray[0], 1);
+      eq(testArray[1], 2);
+      eq(testArray[2], 3);
+      eq(testArray.length, 3);
+    },
+
+    'It should delete all elements from start to the end of the array if [deleteCount] is larger than or equal to the number of elements between start and array.length': function () {
+      var testArray = [1, 2, 3, 4, 5];
+      splice(testArray, 2, 4);
+      eq(testArray[0], 1);
+      eq(testArray[1], 2);
+      eq(testArray.length, 2);
+    },
+
+    'It should not remove any elements if [deleteCount] is 0': function () {
+      var testArray = [1, 2, 3, 4, 5];
+      splice(testArray, 1, 0);
+      eq(testArray[0], 1);
+      eq(testArray[1], 2);
+      eq(testArray[2], 3);
+      eq(testArray[3], 4);
+      eq(testArray[4], 5);
+      eq(testArray.length, 5);
+    },
+
+    'It should not remove any elements if [deleteCount] is negative': function () {
+      var testArray = [1, 2, 3, 4, 5];
+      splice(testArray, 1, -1);
+      eq(testArray[0], 1);
+      eq(testArray[1], 2);
+      eq(testArray[2], 3);
+      eq(testArray[3], 4);
+      eq(testArray[4], 5);
+      eq(testArray.length, 5);
+    },
+
+    'It should take [itemN] as the fourth optional argument and add elements to the array beginning from start': function () {
+      var testArray = [1, 2, 7, 5];
+      splice(testArray, 2, 1, 3, 4);
+      eq(testArray[0], 1);
+      eq(testArray[1], 2);
+      eq(testArray[2], 3);
+      eq(testArray[3], 4);
+      eq(testArray[4], 5);
+      eq(testArray.length, 5);
+    }
+
+
+  });
+</script>

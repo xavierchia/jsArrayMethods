@@ -1,0 +1,101 @@
+<script src="../simpletest.js"></script>
+<script>
+  
+  /*
+  The join() method creates and returns a new string by concatenating all of the elements in an array (or an array-like object), separated by commas or a specified separator string. If the array has only one item, then that item will be returned without using the separator.
+  
+  Syntax:
+    Formula: join(array, [,separator])
+  
+    Arguments:
+    array
+    [separator]
+  
+    Return Value: A string with all array elements joined. If array.length is 0, the empty string is returned
+  
+  Tests:
+    array:
+      It should take an array as the first argument [DONE]
+  
+    separator:
+      It should separate each pair of adjacent elements of the array with a separator as the second optional argument [DONE]
+      It should set separator as comma if omitted [DONE]
+      It should join elements without any characters between them if separator is an empty string [DONE]
+  
+    return value:
+      It should return a string [DONE]
+      It should return an empty string if array.length is 0 [DONE]
+      It should, if an element is undefined, null, or an empty array, convert to an empty string [DONE]
+  */
+
+  function join(array, separator) {
+    // Validity check
+    if (!Array.isArray(array)) {
+      throw new TypeError('First argument is not an array');
+    }
+
+    var result = '';
+
+    if (separator === undefined) {
+      var separator = ',';
+    }
+
+    // Looping through the array and adding elements to result string
+    for (var i = 0; i < array.length; i++) {
+      // Modifying element to an empty string
+      if (array[i] === undefined || array[i] === null) {
+        array[i] = '';
+      }
+      result += array[i];
+      // Adding separator if before the last element
+      if (i < array.length - 1) {
+        result += separator;
+      }
+    }
+    return result;
+  }
+
+  tests({
+    'It should take an array as the first argument': function () {
+      var isTypeError = false;
+      try {
+        join('I am not an array');
+      }
+      catch (error) {
+        isTypeError = error instanceof TypeError;
+        var errorMessage = error.message;
+      }
+      eq(isTypeError, true);
+      eq(errorMessage, 'First argument is not an array');
+    },
+    'It should separate each pair of adjacent elements of the array with a separator as the second optional argument': function () {
+      var result = join([1, 2], '-');
+      eq(result, '1-2');
+    },
+    'It should set separator as comma if omitted': function () {
+      var result = join([1, 2]);
+      eq(result, '1,2');
+    },
+    'It should join elements without any characters between them if separator is an empty string': function () {
+      var result = join([1, 2, 3], '');
+      eq(result, '123');
+    },
+    'It should return a string': function () {
+      var result = join([1, 2, 3]);
+      eq(typeof result, 'string');
+    },
+    'It should return an empty string if array.length is 0': function () {
+      // Without separator
+      var resultWithoutSeparator = join([]);
+      eq(resultWithoutSeparator, '');
+
+      // With separator
+      var resultWithSeparator = join([], ',');
+      eq(resultWithSeparator, '');
+    },
+    'It should, if an element is undefined, null, or an empty array, convert to an empty string': function () {
+      var result = join([[], undefined, null, 1]);
+      eq(result, ',,,1');
+    }
+  });
+</script>

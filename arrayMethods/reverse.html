@@ -1,0 +1,65 @@
+<script src="../simpletest.js"></script>
+<script>
+
+  /*
+  The reverse() method reverses an array in place. The first array element becomes the last, and the last array element becomes the first.
+
+  Syntax:
+    Formula: reverse(array)
+
+    Arguments:
+      array
+    
+    Return Value: The reversed array.
+
+  Tests:
+    array:
+      It should take an array as the first argument [DONE]
+      It should reverse the elements in-place [DONE]
+    return value:
+      It should return the same array object [DONE]
+  */
+
+  function reverse(array) {
+    // Validity check
+    if (!Array.isArray(array)) {
+      throw new TypeError('First argument is not an array');
+    }
+
+    // Midpoint of the array
+    var mid = Math.floor(array.length / 2);
+
+    // Swapping values from the front to the back till it reaches the middle of the array
+    for (var forwardIterator = 0; forwardIterator < mid; forwardIterator++) {
+      var backwardIterator = array.length - 1 - forwardIterator;
+      [array[forwardIterator], array[backwardIterator]] = [array[backwardIterator], array[forwardIterator]];
+    }
+    return array;
+  }
+
+  tests({
+    'It should take an array as the first argument': function () {
+      var isTypeError = false;
+      try {
+        reverse('I am not an array');
+      }
+      catch (error) {
+        isTypeError = error instanceof TypeError;
+        var errorMessage = error.message;
+      }
+      eq(isTypeError, true);
+      eq(errorMessage, 'First argument is not an array');
+    },
+    'It should reverse the elements in-place': function () {
+      var reversedArray = reverse([1, 2, 3]);
+      eq(reversedArray[0], 3);
+      eq(reversedArray[1], 2);
+      eq(reversedArray[2], 1);
+    },
+    'It should return the same array object': function () {
+      var testArray = [1, 2, 3];
+      var reversedArray = reverse(testArray);
+      eq(testArray, reversedArray);
+    }
+  });
+</script>

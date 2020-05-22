@@ -1,0 +1,141 @@
+<script src="../simpletest.js"></script>
+<script>
+
+  /*
+  The fill() method changes all elements in an array to a static value, from a start index (default 0) to an end index (default array.length). It returns the modified array.
+
+  Syntax:
+  Formula: fill(array, fillValue [, startIndex [, endIndex]])
+
+   Arguments:
+    array
+    fillValue
+    [startIndex]
+    [endIndex]
+  
+  Return Value: The modified array, filled with value
+  
+  Tests:
+    array:
+      It should take an array as the first argument [DONE]
+      It should fill all elements in the array with a fillValue as the second argument [DONE]
+      It should not change array.length [DONE]
+      It should, if fillValue is an object, reference the same object for each filled element
+    startIndex:
+      It should have a startIndex as the optional second argument
+      It should treat startIndex as array.length + startIndex if startIndex is negative
+    endIndex:
+      It should have an exclusive endIndex as the optional third argument
+      It should treat endIndex as array.length + endIndex if endIndex is negative
+    return value:
+      It should return the modified array, filled with fillValue
+  */
+
+  function fill(array, fillValue, startIndex, endIndex) {
+    // Validity check
+    if (!Array.isArray(array)) {
+      throw new TypeError('First argument is not an array');
+    }
+
+    // startIndex cases
+    if (startIndex === undefined) {
+      var startIndex = 0;
+    }
+    if (startIndex < 0) {
+      startIndex = array.length + startIndex;
+    }
+
+    // endIndex cases
+    if (endIndex === undefined) {
+      var endIndex = array.length;
+    }
+    if (endIndex < 0) {
+      endIndex = array.length + endIndex;
+    }
+    if (endIndex > array.length) {
+      endIndex = array.length;
+    }
+
+    // Looping through the array and filling
+    for (var i = startIndex; i < endIndex; i++) {
+      array[i] = fillValue;
+    }
+
+    return array;
+  }
+
+
+  tests({
+    'It should take an array as the first argument': function () {
+      var isTypeError = false;
+      try {
+        fill('I am not an array');
+      }
+      catch (error) {
+        isTypeError = error instanceof TypeError;
+        var errorMessage = error.message;
+      }
+      eq(isTypeError, true);
+      eq(errorMessage, 'First argument is not an array');
+    },
+    'It should fill all elements in the array with a fillValue as the second argument': function () {
+      var testArray = [1, 2, 3];
+      fill(testArray, 5);
+      eq(testArray[0], 5);
+      eq(testArray[1], 5);
+      eq(testArray[2], 5);
+    },
+    'It should not change array.length': function () {
+      var newArray = fill([1, 2, 3, 4], 5, 0, 10);
+      eq(newArray.length, 4);
+      eq(newArray[0], 5);
+      eq(newArray[1], 5);
+      eq(newArray[2], 5);
+      eq(newArray[3], 5);
+    },
+    'It should have a startIndex as the optional second argument': function () {
+      var testArray = [1, 2, 3];
+      fill(testArray, 5, 1);
+      eq(testArray[0], 1);
+      eq(testArray[1], 5);
+      eq(testArray[2], 5);
+    },
+
+    'It should have an exclusive endIndex as the optional third argument': function () {
+      var testArray = [1, 2, 3, 4];
+      fill(testArray, 5, 1, 3);
+      eq(testArray[0], 1);
+      eq(testArray[1], 5);
+      eq(testArray[2], 5);
+      eq(testArray[3], 4);
+    },
+
+    'It should return the modified array, filled with fillValue': function () {
+      var testArray = [1, 2, 3, 4];
+      var newArray = fill(testArray, 5, 1, 3);
+      eq(newArray[0], 1);
+      eq(newArray[1], 5);
+      eq(newArray[2], 5);
+      eq(newArray[3], 4);
+      eq(testArray, newArray);
+    },
+
+    'It should treat startIndex as array.length + startIndex if startIndex is negative': function () {
+      var newArray = fill([1, 2, 3, 4], 5, -2);
+      eq(newArray[0], 1);
+      eq(newArray[1], 2);
+      eq(newArray[2], 5);
+      eq(newArray[3], 5);
+    },
+
+    'It should treat endIndex as array.length + endIndex if endIndex is negative': function () {
+      var newArray = fill([1, 2, 3, 4], 5, 0, -2);
+      eq(newArray[0], 5);
+      eq(newArray[1], 5);
+      eq(newArray[2], 3);
+      eq(newArray[3], 4);
+    },
+
+
+  });
+</script>

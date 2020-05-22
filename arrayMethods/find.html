@@ -1,0 +1,168 @@
+<script src="../simpletest.js"></script>
+
+<script>
+  
+  /*
+  The find() method returns the value of the first element in the provided array that satisfies the provided testing function.
+  
+  Syntax:
+    Function: find(array, callback(element[, index[, array]]) [, thisArg])
+  
+    Arguments: 
+    array
+    callback
+      element
+      [index]
+      [array]
+    [thisArg]
+  
+    Return Value: The value of the first element in the array that satisfies the provided testing function, otherwise undefined is returned
+  
+  Tests:
+    array:
+      It should take an array as the first argument [DONE]
+    callback:
+      It should take a callback function as the second argument [DONE]
+      It should run callback function on each element in the array if each does not pass the testing function [DONE]
+      It should run callback on indexes without assigned values [DONE]
+      It should not run callback any elements added to the array after the call to find begins [DONE]
+      It should run callback on an existing, yet unvisited element value, where the value passed to the callback will be the value at the time `find` visits the element's index [DONE]
+      It should run callback on elements that are deleted [DONE]
+    callback arguments:
+      It should take the current element in the array as the first argument in the callback function [DONE]
+      It should take index of the current element in the array as the second optional argument in the callback function [DONE]
+      It should take array that find was called on as the third optional argument in the callback function [DONE]
+    thisArg:
+      It should take an object to use as `this` when executing the callback as the third optional argument [DONE]
+    return value:
+      It should return the first element in the array that satisfies the provided testing function [DONE]
+      It should return undefined if no element in the array satisfies the provided testing function [DONE]
+  */
+
+  function find(array, callback, thisArg) {
+    // Validity check
+    if (!Array.isArray(array)) {
+      throw new TypeError('First argument is not an array');
+    }
+    if (typeof callback !== 'function') {
+      throw new TypeError('Second argument is not a function');
+    }
+
+    if (thisArg) {
+      callback = callback.bind(thisArg);
+    }
+
+    // Loop through the array and run callback
+    var arrayOriginalLength = array.length;
+    for (var i = 0; i < arrayOriginalLength; i++) {
+      if (callback(array[i], i, array)) {
+        return array[i];
+      };
+    }
+    return undefined;
+  }
+
+  tests({
+    'It should take an array as the first argument.': function () {
+      var isTypeError = false;
+      var errorMessage
+      try {
+        find('I am not an array');
+      }
+      catch (error) {
+        isTypeError = error instanceof TypeError;
+        errorMessage = error.message;
+      }
+      eq(isTypeError, true);
+      eq(errorMessage, 'First argument is not an array');
+    },
+    'It should take a callback function as the second argument': function () {
+      var isTypeError = false;
+      try {
+        find([1, 2, 3], 'I am not a function');
+      }
+      catch (error) {
+        isTypeError = error instanceof TypeError;
+        var errorMessage = error.message;
+      }
+      eq(isTypeError, true);
+      eq(errorMessage, 'Second argument is not a function');
+    },
+    'It should run callback function on each element in the array if it does not pass the testing function': function () {
+      var numTimesCallbackRan = 0;
+      find([1, 2, 3], function () {
+        numTimesCallbackRan++;
+      });
+      eq(numTimesCallbackRan, 3);
+    },
+    'It should run callback on indexes without assigned values': function () {
+      var numTimesCallbackRan = 0;
+      find([, , 3], function () {
+        numTimesCallbackRan++;
+      });
+      eq(numTimesCallbackRan, 3);
+    },
+    'It should not visit any elements added to the array after the call to find begins': function () {
+      var testArray = [1, 2, 3];
+      var numTimesCallbackRan = 0;
+      find(testArray, function () {
+        testArray.push(4);
+        numTimesCallbackRan++;
+      });
+      eq(numTimesCallbackRan, 3);
+    },
+    'It should run callback on an existing, yet unvisited element value, where the value passed to the callback will be the value at the time `find` visits the element\'s index': function () {
+      var testArray = [1, 2, 3];
+      var result = find(testArray, function (element) {
+        testArray[2] = 6;
+        return element === 6;
+      });
+      eq(result, 6);
+    },
+    'It should visit elements that are deleted': function () {
+      var numTimesCallbackRan = 0;
+      var testArray = [1, 2, 3];
+      find(testArray, function (element, index) {
+        if (index === 0) {
+          delete testArray[2];
+        }
+        numTimesCallbackRan++;
+      });
+      eq(numTimesCallbackRan, 3);
+    },
+    'It should take the current element in the array as the first argument in the callback function': function () {
+      find([1], function (element) {
+        eq(element, 1);
+      });
+    },
+    'It should take index of the current element in the array as the second optional argument in the callback function': function () {
+      find([1], function (element, index) {
+        eq(index, 0);
+      });
+    },
+    'It should take array that find was called on as the third optional argument in the callback function': function () {
+      var testArray = [1, 2, 3];
+      find(testArray, function (element, index, array) {
+        eq(testArray, array);
+      });
+    },
+    'It should pass an object to use as `this` inside callback as the third optional argument': function () {
+      find([1], function () {
+        eq(this.description, 'I am an object description property')
+      }, { description: 'I am an object description property' })
+    },
+    'It should return the first element in the array that satisfies the provided testing function': function () {
+      var result = find([1, 2, 3], function (element) {
+        return element > 2;
+      });
+      eq(result, 3);
+    },
+    'It should return undefined if no element in the array satisfies the provided testing function': function () {
+      var result = find([1, 2, 3], function (element) {
+        return element > 3;
+      });
+      eq(result, undefined);
+    }
+  });
+
+</script>

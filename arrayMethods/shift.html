@@ -1,0 +1,70 @@
+<script src="../simpletest.js"></script>
+<script>
+
+  /*
+  The shift() method removes the first element from an array and returns that removed element. This method changes the length of the array.
+  
+  Syntax:
+    Formula: shift(array)
+  
+    Arguments:
+    array
+  
+    Return Value: The removed element from the array; undefined if the array is empty
+  
+  Tests:
+    array:
+      It should take an array as the first argument [DONE]
+      It should remove the first element from the array [DONE]
+    return value:
+      It should return undefined if array.length is 0 [DONE]
+  */
+
+  function shift(array) {
+    // Validity check
+    if (!Array.isArray(array)) {
+      throw new TypeError('First argument is not an array');
+    }
+
+    var firstElement = array[0];
+
+    // Shift elements one index to the left
+    if (array.length > 0) {
+      for (var i = 0; i < array.length; i++) {
+        array[i] = array[i + 1];
+      }
+      // Trimming the last element from the array
+      array.length = array.length - 1;
+    }
+    return firstElement;
+  }
+
+  tests({
+    'It should take an array as the first argument': function () {
+      var isTypeError = false;
+      try {
+        shift('I am not an array');
+      }
+      catch (error) {
+        isTypeError = error instanceof TypeError;
+        var errorMessage = error.message;
+      }
+      eq(isTypeError, true);
+      eq(errorMessage, 'First argument is not an array');
+    },
+    'It should remove the first element of the array': function () {
+      var testArray = [1, 2];
+      shift(testArray);
+      eq(testArray[0], 2);
+      eq(testArray.length, 1);
+    },
+    'It should return the removed element': function () {
+      var result = shift([1, 2]);
+      eq(result, 1);
+    },
+    'It should return undefined if array.length is 0': function () {
+      var result = shift([]);
+      eq(result, undefined);
+    }
+  });
+</script>

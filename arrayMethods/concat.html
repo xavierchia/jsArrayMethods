@@ -1,0 +1,120 @@
+<script src="../simpletest.js"></script>
+<script>
+  
+  /*
+  The concat() method is used to merge two or more arrays. This method does not change the existing arrays, but instead returns a new array.
+  
+  Syntax
+    Formula: concat(array [,...valueN])
+  
+    Arguments:
+    array
+    [...valueN]
+    
+    Return Values: A new array instance
+  
+  Tests:
+    array:
+      It should take an array as the first argument [DONE]
+    copying elements:
+      It should copy object references, and not the actual object [DONE]
+      It should copy the values of strings, numbers, and booleans [DONE]
+    return value:
+      It should return a new array instance [DONE]
+      It should return a shallow copy of the existing array on which it is called if valueN is omitted [DONE]
+      It should concatenate multiple optional valueN into the new array (test for array and non-array values) [DONE]
+  */
+
+  function concat(array, ...valueN) {
+    // Validity check
+    if (!Array.isArray(array)) {
+      throw new TypeError('First argument is not an array');
+    }
+
+    var newArray = array.slice(0);
+
+    // Run through the array of the rest parameter
+    for (var i = 0; i < valueN.length; i++) {
+      var value = valueN[i]
+
+      // If element in rest parameter array is an array
+      if (value instanceof Array) {
+        for (var j = 0; j < value.length; j++) {
+          newArray.push(value[j]);
+        }
+      }
+
+      // If element in rest parameter array is not an array
+      else {
+        newArray.push(value);
+      }
+    }
+    return newArray;
+  }
+
+  tests({
+    'It should take an array as the first argument': function () {
+      var isTypeError = false;
+      try {
+        concat('I am not an array');
+      }
+      catch (error) {
+        isTypeError = error instanceof TypeError;
+        var errorMessage = error.message;
+      }
+      eq(isTypeError, true);
+      eq(errorMessage, 'First argument is not an array');
+    },
+    'It should copy object references, and not the actual object': function () {
+      // Copying from valueN
+      var testObject = { test: 'test' };
+      var newArray = concat([1], testObject);
+      eq(newArray[1], testObject);
+
+      // Copying from input array
+      var newArray = concat([testObject]);
+      eq(newArray[0], testObject);
+    },
+    'It should copy the values of strings, numbers, and booleans ': function () {
+      var newArrayWithString = concat([1], 'string');
+      eq(newArrayWithString[1], 'string');
+
+      var newArrayWithNumber = concat([1], 23);
+      eq(newArrayWithNumber[1], 23);
+
+      var newArrayWithBoolean = concat([1], true);
+      eq(newArrayWithBoolean[1], true);
+    },
+    'It should return a new Array instance': function () {
+      var testArray = [1, 2, 3];
+      var newArray = concat(testArray);
+      eq(Array.isArray(newArray), true);
+      eq(newArray !== testArray, true);
+    },
+    'It should return a shallow copy of the existing array on which it is called if valueN is omitted': function () {
+      var newArray = concat([1, 2, 3]);
+      eq(newArray[0], 1);
+      eq(newArray[1], 2);
+      eq(newArray[2], 3);
+      eq(newArray.length, 3);
+    },
+    'It should concatenate multiple optional valueN into the new array': function () {
+      // For non-array arguments, argument itself will be used
+      var newArray = concat([1], 2, 3);
+      eq(newArray[0], 1);
+      eq(newArray[1], 2);
+      eq(newArray[2], 3);
+
+      // For array arguments, elements of the array will be used
+      var newArray = concat([1], [2, 3]);
+      eq(newArray[0], 1);
+      eq(newArray[1], 2);
+      eq(newArray[2], 3);
+    },
+
+
+
+
+
+  });
+</script>

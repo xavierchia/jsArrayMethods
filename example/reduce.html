@@ -1,0 +1,153 @@
+<script src="../tinytest.js"></script>
+<script>
+
+  
+function reduce(array, callback, initialValue){
+  // Without initialValue
+  if (initialValue === undefined) {
+    // With an empty array
+    if (Object.keys(array).length === 0) {
+      throw new TypeError('Reduce of empty array with no initial value');
+    }
+    var accumulator = array.find(element => element !== undefined)
+    var startingIndex = array.indexOf(accumulator) + 1;
+  }
+
+  // With initalValue
+  else {
+    var accumulator = initialValue;
+    var startingIndex = 0;
+  }
+
+  // Fixing array length for the case where array increases in size with callbacks
+  // Looping through the array
+  var arrayLength = array.length
+  for (var i = startingIndex; i < arrayLength; i++) {
+    if (i in array) {
+      accumulator = callback(accumulator, array[i], i, array);  
+    }
+  }
+
+  // Result
+  return accumulator;
+}
+
+// For quick testing:
+// var arrayA = [1,2,3]
+// var output = reduce(arrayA,function(acc, elem){
+//   arrayA.push(elem);
+//   return acc + elem;
+// });
+
+// console.log(output);
+
+
+tests({
+  'It should execute callback function array.length times if initialValue exists': function() {
+    var numberTimesCallbackRan = 0;
+    reduce([1,2,3], function() {
+      numberTimesCallbackRan++;
+    }, 0);
+    eq(numberTimesCallbackRan, 3);
+  },
+
+  'It should execute callback function array.length-1 times (skipping the first  assigned element) if initialValue does not exist': function() {
+    var numberTimesCallbackRan = 0;
+    reduce([1,2,3], function() {
+      numberTimesCallbackRan++;
+    });
+    eq(numberTimesCallbackRan, 2);
+  },
+
+  'It should pass an accumulator as the first argument of the callback function':function() {
+    // Without initialValue, accumulator is set to first element of array
+    reduce([1,2], function(accumulator) {
+      eq(accumulator, 1);
+    });
+    // With initialValue, accumulator is set to initialValue
+    reduce([1], function(accumulator) {
+      eq(accumulator, 5);
+    }, 5);
+  },
+
+  'It should pass the current element as the second argument of the callback':function() {
+
+    // Without initialValue, first element is skipped
+    reduce([1,2], function(accumulator, currentValue) {
+        eq(currentValue, 2);
+    });
+     
+    // With initialValue
+    reduce([1], function(accumulator, currentValue) {
+        eq(currentValue, 1);
+    }, 5);
+  },
+
+  'It should pass the index of the current element being processed in the array as the third optional argument of the callback':function() {
+
+    // Without initialValue, first index is skipped
+    reduce([1, 2], function(accummulator, currentValue, index) {
+      eq(index, 1);
+    });
+
+    // With initialvalue
+    reduce([1], function(accummulator, currentValue, index) {
+      eq(index, 0);
+    },5);
+  },
+
+  'It should pass the array reduce() was called upon as the fourth optional argument of the callback': function() {
+    var testArray = [1,2,3];
+
+    // Without initialValue
+    reduce(testArray, function(accumulator, currentValue, index, originalArray) {
+      eq(testArray, originalArray);
+    });
+
+    // With initialValue
+    reduce(testArray, function(accumulator, currentValue, index, originalArray) {
+      eq(testArray, originalArray);
+    }, 5);
+  },
+
+  'It should return a single value that results from the reduction':function() {
+    // Without initialValue
+    var resultWithoutInitialValue = reduce([1,2,3], function(accumulator, currentValue, index, originalArray) {
+      return accumulator + currentValue;
+    });
+    eq(resultWithoutInitialValue, 6);
+
+    // With initialValue
+    var resultWithInitialValue = reduce([1,2,3], function(accumulator, currentValue, index, originalArray) {
+      return accumulator + currentValue;
+    }, 5);
+    eq(resultWithInitialValue, 11);
+  },
+
+  'It should skip the array element if there is a hole': function() {
+
+    // Without initialValue
+    var resultWithoutInitialValue = reduce([,2,,3], function(accumulator, currentValue, index, originalArray) {
+      return accumulator + currentValue;
+    });
+    eq(resultWithoutInitialValue, 5);
+
+    // With initialValue
+    var resultWithInitialValue = reduce([,2,,3], function(accumulator, currentValue, index, originalArray) {
+      return accumulator + currentValue;
+    }, 5);
+    eq(resultWithInitialValue, 10);
+  },
+
+  'It should throw a TypeError if input array is empty with no initial value': function() {
+    var isTypeError = false;
+    try {
+      reduce([], function(){});
+    }
+    catch (e) {
+      isTypeError = e instanceof TypeError;
+    }
+    eq(isTypeError, true);
+  }
+});
+</script>

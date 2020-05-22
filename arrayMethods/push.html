@@ -1,0 +1,64 @@
+<script src="../simpletest.js"></script>
+<script>
+
+  /*
+  The push() method adds one or more elements to the end of an array and returns the new length of the array.
+  
+  Syntax: 
+    Formula: push(array, [,...elementN])
+  
+    Arguments:
+    array
+    [...elementN]
+  
+    Return Value: The new length property of the object upon which the method was called
+
+  Tests:
+    array:
+      It should take an array as the first argument [DONE]
+    elementN:
+      It should add one or more elements to the end of an array [DONE]
+    return value:
+      It should return the new length of the array [DONE]
+  */
+
+  function push(array, ...elementN) {
+    // Validity check
+    if (!Array.isArray(array)) {
+      throw new TypeError('First argument is not an array');
+    }
+
+    // Looping through the elementN and adding to the array
+    for (var i = 0; i < elementN.length; i++) {
+      var element = elementN[i];
+      array[array.length] = element;
+    }
+    return array.length;
+  }
+
+  tests({
+    'It should take an array as the first argument': function () {
+      var isTypeError = false;
+      try {
+        push('I am not an array');
+      }
+      catch (error) {
+        isTypeError = error instanceof TypeError;
+        var errorMessage = error.message;
+      }
+      eq(isTypeError, true);
+      eq(errorMessage, 'First argument is not an array');
+    },
+    'It should add one or more elements to the end of an array': function () {
+      var testArray = [1];
+      push(testArray, 2, 3);
+      eq(testArray[0], 1);
+      eq(testArray[1], 2);
+      eq(testArray[2], 3);
+    },
+    'It should return the new length of the array': function () {
+      var result = push([1], 2, 3);
+      eq(result, 3);
+    }
+  });
+</script>

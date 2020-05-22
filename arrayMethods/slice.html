@@ -1,0 +1,118 @@
+<script src="../simpletest.js"></script>
+<script>
+  
+  /*
+  The slice() method returns a shallow copy of a portion of an array into a new array object selected from begin to end (end not included) where begin and end represent the index of items in that array. The original array will not be modified.
+  
+  Syntax:  
+    Formula: slice(array, [begin[, end]])
+  
+    Arguments:
+    array
+    [begin]
+    [end]
+  
+    Return Value: A new array containing the extracted elements
+  
+  Tests:
+    array:
+      It should take array as the first argument [DONE]
+    begin:
+      It should take a begin index as the optional second argument [DONE]
+      It should set begin at 0 if begin is omitted [DONE]
+      It should offset from the end of the sequence if begin is negative [DONE]
+      It should return an empty array if begin is greater than the index range of the sequence [DONE]
+    end:
+      It should return a zero-based index before which to end extraction as the optional third argument [DONE]
+      It should assign end to array.length if end is omitted [DONE]
+      It should indicate an offset from the end of the sequence if end is negative [DONE]
+    return value:
+      It should return a new array [DONE]
+  */
+
+  function slice(array, begin, end) {
+    // Validity check
+    if (!Array.isArray(array)) {
+      throw new TypeError('First argument is not an array');
+    }
+
+    var newArray = [];
+
+    // Modifying arguments into valid inputs
+    if (begin === undefined) {
+      var begin = 0;
+    }
+    if (begin < 0) {
+      begin = array.length + begin;
+    }
+    if (end === undefined) {
+      var end = array.length;
+    }
+    if (end < 0) {
+      end = array.length + end;
+    }
+
+    // Adding selected elements to new array
+    for (var i = begin; i < end; i++) {
+      newArray.push(array[i]);
+    }
+    return newArray;
+  }
+
+  tests({
+    'It should take an array as the first argument': function () {
+      var isTypeError = false;
+      try {
+        slice('I am not an array');
+      }
+      catch (error) {
+        isTypeError = error instanceof TypeError;
+        var errorMessage = error.message;
+      }
+      eq(isTypeError, true);
+      eq(errorMessage, 'First argument is not an array');
+    },
+    'It should take a begin index as the optional second argument': function () {
+      var newArray = slice([1, 2], 1);
+      eq(newArray[0], 2);
+    },
+    'It should set begin at 0 if begin is omitted': function () {
+      var newArray = slice([1, 2, 3]);
+      eq(newArray[0], 1);
+      eq(newArray[1], 2);
+      eq(newArray[2], 3);
+    },
+    'It should offset from the end of the sequence if begin is negative': function () {
+      var newArray = slice([1, 2, 3], -1);
+      eq(newArray[0], 3);
+    },
+    'It should return an empty array if begin is greater than the index range of the sequence': function () {
+      var newArray = slice([1, 2, 3], 3);
+      eq(newArray.length, 0);
+    },
+    'It should return a zero-based index before which to end extraction as the optional third argument': function () {
+      var newArray = slice([1, 2, 3], 0, 2);
+      eq(newArray[0], 1);
+      eq(newArray[1], 2);
+      eq(newArray[2], undefined);
+    },
+    'It should assign end to array.length if end is omitted': function () {
+      var newArray = slice([1, 2, 3]);
+      eq(newArray[0], 1);
+      eq(newArray[1], 2);
+      eq(newArray[2], 3);
+    },
+    'It should indicate an offset from the end of the sequence if end is negative': function () {
+      var newArray = slice([1, 2, 3], 0, -1);
+      eq(newArray[0], 1);
+      eq(newArray[1], 2);
+      eq(newArray[2], undefined);
+    },
+    'It should return a new array': function () {
+      var testArray = [1, 2, 3];
+      var newArray = slice(testArray);
+      eq(Array.isArray(newArray), true);
+      eq(testArray !== newArray, true);
+    }
+  });
+</script>

@@ -1,0 +1,89 @@
+<script src="../tinytest.js"></script>
+<script>
+  
+function map(array, callback, optionalThisObject){
+
+  if (optionalThisObject) {
+    callback = callback.bind(optionalThisObject);
+  }
+
+  var mappedArray = [];
+
+  for (var i = 0; i < array.length; i++) {
+    if (i in array) {
+      mappedArray[i] = callback(array[i], i, array);
+    }
+  }
+  return mappedArray;
+
+}
+
+tests({
+  'It should run callback array.length times': function() {
+    var numberTimesCallbackRan = 0;
+    map([1,2,3], function() {
+      numberTimesCallbackRan++;
+    });
+    eq(numberTimesCallbackRan, 3);
+  },
+
+  'It should pass each element in the array as the first argument of the callback':function() {
+    map([1], function(element) {
+      eq(element, 1);
+    });
+  },
+
+  'It should pass the element position as the second optional argument of the callback':function() {
+    map([1], function(element, index) {
+      eq(index, 0);
+    })
+  },
+
+  'It should pass the original array as the third optional argument of the callback': function() {
+    var testArray = [1,2,3];
+    map(testArray, function(element, index, originalArray) {
+      eq(testArray, originalArray);
+    });
+  },
+
+  'It should pass an optional this object into the third argument of map function':function() {
+    map([1], function() {
+      eq(this.description, 'I should be accessible in the callback')
+    }, {description: 'I should be accessible in the callback'})
+  },
+
+  'It should return a new array':function() {
+    var mappedArray = map([], function() {
+      return true;
+    });
+    eq(Array.isArray(mappedArray), true);
+  },
+
+  'It should return an array different from the input array':function() {
+    var testArray = [1];
+    var mappedArray = map(testArray, function() {
+      return true;
+    });
+    eq(testArray !== mappedArray, true);
+  },
+
+  'It should return a new mapped array, where elements are the result of the input array elements passed through the callback function': function() {
+    var mappedArray = map([1,2,3], function addOne(element) {
+      return element + 1;
+    });
+    eq(mappedArray[0], 2);
+    eq(mappedArray[1], 3);
+    eq(mappedArray[2], 4);
+    eq(mappedArray.length, 3);
+  },
+
+  'It should return a new mapped array, ignoring missing elements': function() {
+    var mappedArray = map([,2], function double(element) {
+      return element * 2;
+    });
+    eq(mappedArray[1], 4);
+    eq(mappedArray.length, 2);
+  }
+
+});
+</script>

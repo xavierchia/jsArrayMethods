@@ -1,0 +1,67 @@
+<script src="../simpletest.js"></script>
+<script>
+  
+  /*
+  The pop() method removes the last element from an array and returns that element. This method changes the length of the array.
+  
+  Syntax: 
+    Formula: pop(array)
+  
+    Arguments:
+    array
+  
+    Return Value: The removed element from the array; undefined if the array is empty
+
+  Tests:
+    array:
+      It should take an array as the first argument [DONE]
+      It should remove the last element from the array [DONE]
+    return value:
+      It should return the element that was removed [DONE]
+      It should return undefined if array is empty [DONE]
+  */
+
+  function pop(array) {
+    // Validity check
+    if (!Array.isArray(array)) {
+      throw new TypeError('First argument is not an array');
+    }
+
+    var lastElement = array[array.length - 1];
+
+    // Trimming the last element from the array
+    if (array.length > 0) {
+      array.length = array.length - 1;
+    }
+    return lastElement;
+  }
+
+  tests({
+    'It should take an array as the first argument': function () {
+      var isTypeError = false;
+      try {
+        pop('I am not an array');
+      }
+      catch (error) {
+        isTypeError = error instanceof TypeError;
+        var errorMessage = error.message;
+      }
+      eq(isTypeError, true);
+      eq(errorMessage, 'First argument is not an array');
+    },
+    'It should remove the last element from the array': function () {
+      var testArray = [1, 2];
+      pop(testArray);
+      eq(testArray[0], 1);
+      eq(testArray[1], undefined);
+    },
+    'It should return the element that was removed': function () {
+      var result = pop([1, 2]);
+      eq(result, 2);
+    },
+    'It should return undefined if array is empty': function () {
+      var result = pop([]);
+      eq(result, undefined);
+    }
+  });
+</script>

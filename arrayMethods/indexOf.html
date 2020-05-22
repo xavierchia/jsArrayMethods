@@ -1,0 +1,103 @@
+<script src="../simpletest.js"></script>
+<script>
+
+  /*
+  The indexOf() method returns the first index at which a given element can be found in the array, or -1 if it is not present.
+  
+  Syntax:
+    Function: indexOf(array, searchElement[, fromIndex])
+  
+    Arguments:
+    array
+    searchElement
+    [fromIndex]
+
+    Return Value: The first index of the element in the array; -1 if not found
+  
+  Tests: 
+    array:
+      It should take an array as the first argument [DONE]
+    return value:
+      It should return first index of searchElement in the array [DONE]
+      It should return -1 if the searchElement is not found [DONE]
+      It should return -1 if fromIndex is greater than or equal to the array length [DONE]
+    fromIndex:
+      It should start from optional third argument fromIndex [DONE]
+      It should search the whole array if fromIndex is omitted [DONE]
+      It should search the whole array if fromIndex is 0 [DONE]
+      It should offset from the end of the array if fromIndex is a negative number
+  */
+
+  function indexOf(array, searchElement, fromIndex) {
+    // Validity check
+    if (!Array.isArray(array)) {
+      throw new TypeError('First argument is not an array');
+    }
+
+    // Modifying arguments into valid inputs
+    if (fromIndex === undefined) {
+      var fromIndex = 0;
+    }
+    if (fromIndex < 0) {
+      fromIndex = array.length + fromIndex;
+    }
+
+    // Looping through the array to find index
+    for (var i = fromIndex; i < array.length; i++) {
+      // Strict comparison is used in actual method
+      if (array[i] === searchElement) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  tests({
+    'It should take an array as the first argument': function () {
+      var isTypeError = false;
+      try {
+        indexOf('I am not an array');
+      }
+      catch (error) {
+        isTypeError = error instanceof TypeError;
+        var errorMessage = error.message;
+      }
+      eq(isTypeError, true);
+      eq(errorMessage, 'First argument is not an array');
+    },
+    'It should return first index of searchElement in the array': function () {
+      var result = indexOf([1, 2, 3, 3], 3);
+      eq(result, 2)
+    },
+    'It should return -1 if the searchElement is not found': function () {
+      var result = indexOf([1, 2, 3]);
+      eq(result, -1);
+    },
+    'It should return -1 if fromIndex is greater than or equal to the array length': function () {
+      var result = indexOf([1, 2, 3], 3, 3);
+      eq(result, -1);
+
+      var result2 = indexOf([1, 2, 3], 3, 4);
+      eq(result, -1);
+    },
+    'It should start from optional third argument fromIndex': function () {
+      var result = indexOf([3, 1, 2, 3, 4], 3, 1);
+      eq(result, 3);
+    },
+    'It should search the whole array if fromIndex is omitted': function () {
+      var result = indexOf([1, 2, 3, 4, 5], 5);
+      eq(result, 4);
+    },
+    'It should search the whole array if fromIndex is 0': function () {
+      var result = indexOf([1, 2, 3, 4, 5], 5, 0);
+      eq(result, 4);
+    },
+    'It should offset from the end of the array if fromIndex is a negative number': function () {
+      var result = indexOf([3, 2, 3], 3, -1);
+      eq(result, 2);
+
+      var result2 = indexOf([3, 2, 2, 3, 2], 3, -5);
+      eq(result2, 0);
+    }
+  });
+</script>
